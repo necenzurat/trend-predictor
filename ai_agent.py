@@ -39,6 +39,18 @@ def _normalize_ai_error(model_name, model_error):
     message = str(model_error)
     lowered = message.lower()
 
+    if (
+        "api_key_http_referrer_blocked" in lowered
+        or "requests from referer <empty> are blocked" in lowered
+        or ("403" in lowered and "referer" in lowered and "blocked" in lowered)
+    ):
+        return (
+            "AI Error: This Gemini key is restricted by HTTP referrer, but this app "
+            "calls Gemini from Python (server-side), so referer is empty. "
+            "Use a server-compatible key (Application restrictions: None or IP), "
+            "then update GEMINI_API_KEY in Streamlit secrets/env and restart."
+        )
+
     if "reported as leaked" in lowered or ("403" in lowered and "leaked" in lowered):
         return (
             "AI Error: Your Gemini API key was flagged as leaked (403). "

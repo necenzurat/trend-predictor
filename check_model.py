@@ -1,9 +1,13 @@
 import google.generativeai as genai
+import os
 
-# --- PASTE YOUR KEY HERE ---
-API_KEY = "AIzaSyA-xNT0W3OjAY4JvMEtHyMHZm114ph4knY"
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise SystemExit(
+        "Missing API key. Set GEMINI_API_KEY or GOOGLE_API_KEY before running."
+    )
 
-genai.configure(api_key=API_KEY)
+genai.configure(api_key=api_key)
 
 print("Checking available models...")
 try:

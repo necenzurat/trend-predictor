@@ -84,6 +84,11 @@ Follow these steps to run the project on your local machine.
     ADMIN_PASSWORD = "Set_Your_Desired_Password_Here"
     ```
 
+    Important: for this Streamlit app (server-side Python), do not use an API key
+    restricted to HTTP referrers. Use a server-compatible key (Application
+    restrictions set to `None` or IP addresses), otherwise Gemini calls fail with
+    `API_KEY_HTTP_REFERRER_BLOCKED`.
+
 5.  **Run the App**
     ```bash
     streamlit run app.py
