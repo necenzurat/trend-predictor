@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 import streamlit as st
 import time
 import os
@@ -12,10 +12,16 @@ DEFAULT_MODELS = (
 def _model_candidates():
     """
     Priority:
-    1) GEMINI_MODEL env override
+    1) GEMINI_MODEL env override  (or Streamlit secret)
     2) Built-in stable defaults
     """
-    override = os.getenv("GEMINI_MODEL")
+    override = None
+    try:
+        override = st.secrets.get("GEMINI_MODEL")
+    except Exception:
+        pass
+    if not override:
+        override = os.getenv("GEMINI_MODEL")
     if override:
         yield override
     for model_name in DEFAULT_MODELS:
@@ -28,10 +34,8 @@ def get_api_key():
     Pehle Cloud Secrets mein, phir Local Secrets mein.
     """
     try:
-        # Step 1: Streamlit Secrets check karo (Cloud & Local)
         return st.secrets["GEMINI_API_KEY"]
     except Exception:
-        # Step 2: Agar Secrets nahi mile, toh Environment Variable check karo
         return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
 
@@ -67,9 +71,8 @@ def _normalize_ai_error(model_name, model_error):
     return f"AI Error ({model_name}): {message}"
 
 def generate_script(topic):
-    # 1. API Key fetch karo secure tarike se
     api_key = get_api_key()
-    
+
     if not api_key:
         return (
             "Error: API key missing. Add GEMINI_API_KEY to .streamlit/secrets.toml "
@@ -77,8 +80,7 @@ def generate_script(topic):
         )
 
     try:
-        # 2. Configure Gemini
-        genai.configure(api_key=api_key)
+        client = genai.Client(api_key=api_key)
 
         prompt = f"""
         Acționează ca un influencer tech celebru, cu un stil energic, pasionat și foarte accesibil publicului larg.
@@ -111,8 +113,10 @@ Exemplu de format: "Dacă vrei să afli mai multe despre X, dă follow acum — 
         last_error = None
         for model_name in _model_candidates():
             try:
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(prompt)
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
                 return response.text
             except Exception as model_error:
                 last_error = model_error
@@ -125,15 +129,13 @@ Exemplu de format: "Dacă vrei să afli mai multe despre X, dă follow acum — 
                 return _normalize_ai_error(model_name, model_error)
 
         return f"AI Error: No supported Gemini model available. Last error: {last_error}"
-        
+
     except Exception as e:
-        # Agar quota error aaye toh retry logic
         if "429" in str(e):
             time.sleep(2)
             return "Server busy (Rate Limit), trying again... Please wait."
         return f"AI Error: {str(e)}"
 
 if __name__ == "__main__":
-    # Local testing ke liye warning
     print("Testing AI Agent...")
     print(generate_script("Virat Kohli"))
