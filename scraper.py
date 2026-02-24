@@ -5,12 +5,12 @@ def get_trending_topics(category="General"):
     print(f"Connecting to Google News ({category})...")
     
     # Base URL settings
-    base_params = "ceid=RO:en&hl=en-RO&gl=RO"
+    base_params = "?ceid=RO:ro&hl=ro&gl=RO"
     
     # Category Map: Kis interest ke liye kaunsa URL use karein
     urls = {
         "General": f"https://news.google.com/rss?{base_params}",
-        "Tech": f"https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?{base_params}",
+        "Tech": f"https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?ceid=RO:en&hl=en-RO&gl=RO",
         "Business": f"https://news.google.com/rss/headlines/section/topic/BUSINESS?{base_params}",
         "Sports": f"https://news.google.com/rss/headlines/section/topic/SPORTS?{base_params}",
         "Entertainment": f"https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?{base_params}",
@@ -34,7 +34,7 @@ def get_trending_topics(category="General"):
                 title = item.find('title').text
                 clean_title = title.split(' - ')[0]
                 trends.append(clean_title)
-            return trends[:5]
+            return trends[:24]
         else:
             return ["Error fetching news", "Check Internet"]
     except Exception as e:

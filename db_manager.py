@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 
-DB_NAME = "trends.db"
+DB_NAME = "trends222.db"
 
 def init_db():
     """Database aur Table banata hai agar nahi hai toh"""
