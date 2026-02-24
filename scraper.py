@@ -5,7 +5,7 @@ def get_trending_topics(category="General"):
     print(f"Connecting to Google News ({category})...")
     
     # Base URL settings
-    base_params = "ceid=IN:en&hl=en-IN&gl=IN"
+    base_params = "ceid=RO:en&hl=en-RO&gl=RO"
     
     # Category Map: Kis interest ke liye kaunsa URL use karein
     urls = {
